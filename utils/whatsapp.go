@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/pfthink/whatsappproxy//config"
+	"github.com/pfthink/whatsappproxy/config"
 	"github.com/pfthink/whatsmeow"
 	"github.com/pfthink/whatsmeow/appstate"
 	waProto "github.com/pfthink/whatsmeow/binary/proto"

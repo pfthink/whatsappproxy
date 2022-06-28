@@ -3,9 +3,9 @@ package validations
 import (
 	"fmt"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/pfthink/whatsappproxy//config"
-	"github.com/pfthink/whatsappproxy//structs"
-	"github.com/pfthink/whatsappproxy//utils"
+	"github.com/pfthink/whatsappproxy/config"
+	"github.com/pfthink/whatsappproxy/structs"
+	"github.com/pfthink/whatsappproxy/utils"
 )
 
 func ValidateSendMessage(request structs.SendMessageRequest) {

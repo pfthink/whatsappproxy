@@ -62,7 +62,7 @@
 - `docker run --publish=3000:3000 --name=whatsapp --restart=always --detach aldinokemal2104/go-whatsapp-web-multidevice --autoreply="Dont't reply this message please"`
 
 ### Production Mode (binary)
-- download binary from [release](https://github.com/pfthink/whatsappproxy//releases)
+- download binary from [release](https://github.com/pfthink/whatsappproxy/releases)
 
 You can fork or edit this source code !
 

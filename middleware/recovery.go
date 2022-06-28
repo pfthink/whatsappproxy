@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/pfthink/whatsappproxy//utils"
+	"github.com/pfthink/whatsappproxy/utils"
 )
 
 func Recovery() fiber.Handler {

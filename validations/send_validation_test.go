@@ -1,7 +1,7 @@
 package validations
 
 import (
-	"github.com/pfthink/whatsappproxy//structs"
+	"github.com/pfthink/whatsappproxy/structs"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

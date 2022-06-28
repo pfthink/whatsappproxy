@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"github.com/pfthink/whatsappproxy//services"
-	"github.com/pfthink/whatsappproxy//structs"
-	"github.com/pfthink/whatsappproxy//utils"
-	"github.com/pfthink/whatsappproxy//validations"
+	"github.com/pfthink/whatsappproxy/services"
+	"github.com/pfthink/whatsappproxy/structs"
+	"github.com/pfthink/whatsappproxy/utils"
+	"github.com/pfthink/whatsappproxy/validations"
 )
 
 type UserController struct {

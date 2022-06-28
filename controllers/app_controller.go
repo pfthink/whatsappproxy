@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/pfthink/whatsappproxy//services"
-	"github.com/pfthink/whatsappproxy//utils"
+	"github.com/pfthink/whatsappproxy/services"
+	"github.com/pfthink/whatsappproxy/utils"
 )
 
 type AppController struct {
