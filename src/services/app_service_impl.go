@@ -4,12 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/config"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/structs"
-	"github.com/gofiber/fiber/v2"
 	fiberutils "github.com/gofiber/fiber/v2/utils"
-	"github.com/skip2/go-qrcode"
-	"go.mau.fi/whatsmeow"
+	"github.com/pfthink/whatsappproxy/src/config"
+	"github.com/pfthink/whatsappproxy/src/structs"
+	"github.com/pfthink/whatsmeow"
 	"os"
 	"path/filepath"
 	"time"
@@ -53,6 +51,7 @@ func (service AppServiceImpl) Login(c *fiber.Ctx) (response structs.LoginRespons
 				response.Code = evt.Code
 				response.Duration = evt.Timeout / time.Second / 2
 				if evt.Event == "code" {
+					fmt.Println("code:", evt.Code)
 					qrPath := fmt.Sprintf("%s/scan-qr-%s.png", config.PathQrCode, fiberutils.UUIDv4())
 					err = qrcode.WriteFile(evt.Code, qrcode.Medium, 512, qrPath)
 					if err != nil {

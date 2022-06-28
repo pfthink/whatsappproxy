@@ -1,11 +1,10 @@
 package controllers
 
 import (
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/services"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/structs"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/utils"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/validations"
-	"github.com/gofiber/fiber/v2"
+	"github.com/pfthink/whatsappproxy/src/services"
+	"github.com/pfthink/whatsappproxy/src/structs"
+	"github.com/pfthink/whatsappproxy/src/utils"
+	"github.com/pfthink/whatsappproxy/src/validations"
 )
 
 type SendController struct {

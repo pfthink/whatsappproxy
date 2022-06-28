@@ -2,8 +2,7 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/utils"
-	"github.com/gofiber/fiber/v2"
+	"github.com/pfthink/whatsappproxy/src/utils"
 )
 
 func Recovery() fiber.Handler {

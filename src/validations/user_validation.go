@@ -1,10 +1,10 @@
 package validations
 
 import (
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/structs"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/utils"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
+	"github.com/pfthink/whatsappproxy/src/structs"
+	"github.com/pfthink/whatsappproxy/src/utils"
 )
 
 func ValidateUserInfo(request structs.UserInfoRequest) {

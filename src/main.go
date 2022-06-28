@@ -1,6 +1,6 @@
 package main
 
-import "github.com/aldinokemal/go-whatsapp-web-multidevice/cmd"
+import "github.com/pfthink/whatsappproxy/src/cmd"
 
 func main() {
 	cmd.Execute()

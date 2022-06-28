@@ -1,7 +1,7 @@
 package validations
 
 import (
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/structs"
+	"github.com/pfthink/whatsappproxy/src/structs"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

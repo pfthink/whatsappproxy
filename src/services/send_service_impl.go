@@ -4,14 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/config"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/structs"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/utils"
-	"github.com/gofiber/fiber/v2"
 	fiberUtils "github.com/gofiber/fiber/v2/utils"
 	"github.com/h2non/bimg"
-	"go.mau.fi/whatsmeow"
-	waProto "go.mau.fi/whatsmeow/binary/proto"
+	"github.com/pfthink/whatsappproxy/src/config"
+	"github.com/pfthink/whatsappproxy/src/structs"
+	"github.com/pfthink/whatsappproxy/src/utils"
+	"github.com/pfthink/whatsmeow"
+	waProto "github.com/pfthink/whatsmeow/binary/proto"
 	"google.golang.org/protobuf/proto"
 	"net/http"
 	"os"
@@ -30,17 +29,17 @@ func NewSendService(waCli *whatsmeow.Client) SendService {
 
 func (service SendServiceImpl) SendText(_ *fiber.Ctx, request structs.SendMessageRequest) (response structs.SendMessageResponse, err error) {
 	utils.MustLogin(service.WaCli)
-
 	recipient, ok := utils.ParseJID(request.Phone)
 	if !ok {
 		return response, errors.New("invalid JID " + request.Phone)
 	}
 	msg := &waProto.Message{Conversation: proto.String(request.Message)}
-	ts, err := service.WaCli.SendMessage(recipient, "", msg)
+	msgId := whatsmeow.GenerateMessageID()
+	ts, err := service.WaCli.SendMessage(recipient, msgId, msg)
 	if err != nil {
 		return response, err
 	} else {
-		response.Status = fmt.Sprintf("Message sent to %s (server timestamp: %s)", request.Phone, ts)
+		response.Status = fmt.Sprintf("Message sent to %s (server timestamp: %s),msgId:%s", request.Phone, ts, msgId)
 	}
 	return response, nil
 }

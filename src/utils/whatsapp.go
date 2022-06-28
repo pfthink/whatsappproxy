@@ -1,17 +1,18 @@
 package utils
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/config"
-	"go.mau.fi/whatsmeow"
-	"go.mau.fi/whatsmeow/appstate"
-	waProto "go.mau.fi/whatsmeow/binary/proto"
-	"go.mau.fi/whatsmeow/store"
-	"go.mau.fi/whatsmeow/store/sqlstore"
-	"go.mau.fi/whatsmeow/types"
-	"go.mau.fi/whatsmeow/types/events"
-	waLog "go.mau.fi/whatsmeow/util/log"
+	"github.com/pfthink/whatsappproxy/src/config"
+	"github.com/pfthink/whatsmeow"
+	"github.com/pfthink/whatsmeow/appstate"
+	waProto "github.com/pfthink/whatsmeow/binary/proto"
+	"github.com/pfthink/whatsmeow/store"
+	"github.com/pfthink/whatsmeow/store/sqlstore"
+	"github.com/pfthink/whatsmeow/types"
+	"github.com/pfthink/whatsmeow/types/events"
+	waLog "github.com/pfthink/whatsmeow/util/log"
 	"google.golang.org/protobuf/proto"
 	"mime"
 	"os"
@@ -123,6 +124,10 @@ func handler(rawEvt interface{}) {
 			}
 		}
 	case *events.Connected, *events.PushNameSetting:
+		noise := base64.StdEncoding.EncodeToString(cli.Store.NoiseKey.Pub[:])
+		identity := base64.StdEncoding.EncodeToString(cli.Store.IdentityKey.Pub[:])
+		adv := base64.StdEncoding.EncodeToString(cli.Store.AdvSecretKey)
+		fmt.Printf("Jid:%s, Connected ,noise:%s,- identity:%s -adv:%s ", cli.Store.ID, noise, identity, adv)
 		if len(cli.Store.PushName) == 0 {
 			return
 		}
@@ -208,5 +213,9 @@ func handler(rawEvt interface{}) {
 		_ = file.Close()
 	case *events.AppState:
 		log.Debugf("App state event: %+v / %+v", evt.Index, evt.SyncActionValue)
+	case *events.PairSuccess:
+		//noise := base64.StdEncoding.EncodeToString(cli.Store.NoiseKey.Pub[:])
+		//fmt.Printf("PairSuccess......,noise:%s", evt.ID, noise)
 	}
+
 }

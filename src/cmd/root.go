@@ -2,18 +2,16 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/config"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/controllers"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/middleware"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/services"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/utils"
-	"github.com/dustin/go-humanize"
-	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html"
 	"github.com/markbates/pkger"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/pfthink/whatsappproxy/src/config"
+	"github.com/pfthink/whatsappproxy/src/controllers"
+	"github.com/pfthink/whatsappproxy/src/middleware"
+	"github.com/pfthink/whatsappproxy/src/services"
+	"github.com/pfthink/whatsappproxy/src/utils"
 	"log"
 	"os"
 
@@ -23,7 +21,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Short: "Send free whatsapp API",
-	Long: `This application is from clone https://github.com/aldinokemal/go-whatsapp-web-multidevice, 
+	Long: `This application is from clone https://github.com/pfthink/whatsappproxy/src, 
 you can send whatsapp over http api but your whatsapp account have to be multi device version`,
 	Run: runRest,
 }

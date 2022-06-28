@@ -2,9 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/services"
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/utils"
-	"github.com/gofiber/fiber/v2"
+	"github.com/pfthink/whatsappproxy/src/services"
+	"github.com/pfthink/whatsappproxy/src/utils"
 )
 
 type AppController struct {
@@ -30,6 +29,7 @@ func (controller *AppController) Login(c *fiber.Ctx) error {
 		Message: "Success",
 		Results: map[string]interface{}{
 			"qr_link":     fmt.Sprintf("%s://%s/%s", c.Protocol(), c.Hostname(), response.ImagePath),
+			"code":        response.Code,
 			"qr_duration": response.Duration,
 		},
 	})

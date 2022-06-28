@@ -1,8 +1,7 @@
 package services
 
 import (
-	"github.com/aldinokemal/go-whatsapp-web-multidevice/structs"
-	"github.com/gofiber/fiber/v2"
+	"github.com/pfthink/whatsappproxy/src/structs"
 )
 
 type SendService interface {
