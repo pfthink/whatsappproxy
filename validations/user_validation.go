@@ -3,8 +3,8 @@ package validations
 import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/pfthink/whatsappproxy/src/structs"
-	"github.com/pfthink/whatsappproxy/src/utils"
+	"github.com/pfthink/whatsappproxy//structs"
+	"github.com/pfthink/whatsappproxy//utils"
 )
 
 func ValidateUserInfo(request structs.UserInfoRequest) {

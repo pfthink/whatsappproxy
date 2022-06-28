@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/pfthink/whatsappproxy/src/structs"
+	"github.com/pfthink/whatsappproxy//structs"
 )
 
 type SendService interface {

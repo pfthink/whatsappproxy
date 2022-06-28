@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"github.com/pfthink/whatsappproxy/src/services"
-	"github.com/pfthink/whatsappproxy/src/structs"
-	"github.com/pfthink/whatsappproxy/src/utils"
-	"github.com/pfthink/whatsappproxy/src/validations"
+	"github.com/pfthink/whatsappproxy//services"
+	"github.com/pfthink/whatsappproxy//structs"
+	"github.com/pfthink/whatsappproxy//utils"
+	"github.com/pfthink/whatsappproxy//validations"
 )
 
 type SendController struct {

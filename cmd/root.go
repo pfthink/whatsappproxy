@@ -7,11 +7,11 @@ import (
 	"github.com/gofiber/template/html"
 	"github.com/markbates/pkger"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/pfthink/whatsappproxy/src/config"
-	"github.com/pfthink/whatsappproxy/src/controllers"
-	"github.com/pfthink/whatsappproxy/src/middleware"
-	"github.com/pfthink/whatsappproxy/src/services"
-	"github.com/pfthink/whatsappproxy/src/utils"
+	"github.com/pfthink/whatsappproxy//config"
+	"github.com/pfthink/whatsappproxy//controllers"
+	"github.com/pfthink/whatsappproxy//middleware"
+	"github.com/pfthink/whatsappproxy//services"
+	"github.com/pfthink/whatsappproxy//utils"
 	"log"
 	"os"
 
@@ -21,7 +21,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Short: "Send free whatsapp API",
-	Long: `This application is from clone https://github.com/pfthink/whatsappproxy/src, 
+	Long: `This application is from clone https://github.com/pfthink/whatsappproxy/, 
 you can send whatsapp over http api but your whatsapp account have to be multi device version`,
 	Run: runRest,
 }

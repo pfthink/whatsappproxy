@@ -3,8 +3,8 @@ package services
 import (
 	"errors"
 	"fmt"
-	"github.com/pfthink/whatsappproxy/src/structs"
-	"github.com/pfthink/whatsappproxy/src/utils"
+	"github.com/pfthink/whatsappproxy//structs"
+	"github.com/pfthink/whatsappproxy//utils"
 	"github.com/pfthink/whatsmeow"
 	"github.com/pfthink/whatsmeow/types"
 )
