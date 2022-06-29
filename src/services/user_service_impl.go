@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"go.mau.fi/whatsmeow"
-	"go.mau.fi/whatsmeow/types"
+	"github.com/pfthink/whatsmeow"
+	"github.com/pfthink/whatsmeow/types"
 	"whatsappproxy/structs"
 	"whatsappproxy/utils"
 )

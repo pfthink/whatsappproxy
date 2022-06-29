@@ -1,6 +1,6 @@
 package structs
 
-import "go.mau.fi/whatsmeow/types"
+import "github.com/pfthink/whatsmeow/types"
 
 type UserInfoRequest struct {
 	Phone string `json:"phone" query:"phone"`

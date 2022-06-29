@@ -4,14 +4,15 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"go.mau.fi/whatsmeow"
-	"go.mau.fi/whatsmeow/appstate"
-	waProto "go.mau.fi/whatsmeow/binary/proto"
-	"go.mau.fi/whatsmeow/store"
-	"go.mau.fi/whatsmeow/store/sqlstore"
-	"go.mau.fi/whatsmeow/types"
-	"go.mau.fi/whatsmeow/types/events"
-	waLog "go.mau.fi/whatsmeow/util/log"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/pfthink/whatsmeow"
+	"github.com/pfthink/whatsmeow/appstate"
+	waProto "github.com/pfthink/whatsmeow/binary/proto"
+	"github.com/pfthink/whatsmeow/store"
+	"github.com/pfthink/whatsmeow/store/sqlstore"
+	"github.com/pfthink/whatsmeow/types"
+	"github.com/pfthink/whatsmeow/types/events"
+	waLog "github.com/pfthink/whatsmeow/util/log"
 	"google.golang.org/protobuf/proto"
 	"mime"
 	"os"
@@ -80,7 +81,14 @@ func InitWaDB() *sqlstore.Container {
 	// Running Whatsapp
 	log = waLog.Stdout("Main", config.WhatsappLogLevel, true)
 	dbLog := waLog.Stdout("Database", config.WhatsappLogLevel, true)
-	storeContainer, err := sqlstore.New("sqlite3", fmt.Sprintf("file:%s?_foreign_keys=off", config.DBName), dbLog)
+	//storeContainer, err := sqlstore.New("sqlite3", fmt.Sprintf("file:%s?_foreign_keys=off", config.DBName), dbLog)
+	storeContainer, err := sqlstore.New("mysql", "root:123456@tcp(127.0.0.1:3306)/whatsapp", dbLog)
+
+	//var dbDialect = flag.String("db-dialect", "mysql", "Database dialect (sqlite3 or postgres)")
+
+	//var dbAddress = flag.String("db-address", "file:mdtest.db?_foreign_keys=on", "Database address")
+	//var dbAddress = flag.String("db-address", "root:123456@tcp(127.0.0.1:3306)/whatsapp", "Database address")
+
 	if err != nil {
 		log.Errorf("Failed to connect to database: %v", err)
 		panic(err)
@@ -96,8 +104,8 @@ func InitWaCLI(storeContainer *sqlstore.Container) *whatsmeow.Client {
 		panic(err)
 	}
 
-	store.CompanionProps.PlatformType = waProto.CompanionProps_CHROME.Enum()
-	store.CompanionProps.Os = proto.String("AldinoKemal")
+	store.DeviceProps.PlatformType = waProto.DeviceProps_CHROME.Enum()
+	store.DeviceProps.Os = proto.String("AldinoKemal")
 	cli = whatsmeow.NewClient(device, waLog.Stdout("Client", config.WhatsappLogLevel, true))
 	cli.AddEventHandler(handler)
 
@@ -156,8 +164,8 @@ func handler(rawEvt interface{}) {
 			metaParts = append(metaParts, "ephemeral")
 		}
 
-		log.Infof("Received message %s from %s (%s): %+v", evt.Info.ID, evt.Info.SourceString(), strings.Join(metaParts, ", "), evt.Message)
-
+		//log.Infof("Received message %s from %s (%s): %+v", evt.Info.ID, evt.Info.SourceString(), strings.Join(metaParts, ", "), evt.Message)
+		fmt.Printf("Received message %s from %s (%s): %+v", evt.Info.ID, evt.Info.SourceString(), strings.Join(metaParts, ", "), evt.Message)
 		img := evt.Message.GetImageMessage()
 		if img != nil {
 			data, err := cli.Download(img)
