@@ -8,10 +8,9 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gofiber/fiber/v2 v2.26.0
 	github.com/gofiber/template v1.6.22
-	github.com/h2non/bimg v1.1.6
 	github.com/markbates/pkger v0.17.1
 	github.com/mattn/go-sqlite3 v1.14.11
-	github.com/pfthink/whatsmeow v1.1.0
+	github.com/pfthink/whatsmeow v1.2.7
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.0

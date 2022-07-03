@@ -1,30 +1,25 @@
 package services
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	fiberUtils "github.com/gofiber/fiber/v2/utils"
-	"github.com/h2non/bimg"
 	"github.com/pfthink/whatsmeow"
 	waProto "github.com/pfthink/whatsmeow/binary/proto"
+	"github.com/pfthink/whatsmeow/store/sqlstore"
 	"google.golang.org/protobuf/proto"
-	"net/http"
-	"os"
-	"os/exec"
-	"whatsappproxy/config"
 	"whatsappproxy/structs"
 	"whatsappproxy/utils"
 )
 
 type SendServiceImpl struct {
-	WaCli *whatsmeow.Client
+	WaCli          *whatsmeow.Client
+	storeContainer *sqlstore.Container
 }
 
-func NewSendService(waCli *whatsmeow.Client) SendService {
+func NewSendService(storeContainer *sqlstore.Container) SendService {
 	return &SendServiceImpl{
-		WaCli: waCli,
+		storeContainer: storeContainer,
 	}
 }
 
@@ -48,7 +43,7 @@ func (service SendServiceImpl) SendText(_ *fiber.Ctx, request structs.SendMessag
 func (service SendServiceImpl) SendImage(c *fiber.Ctx, request structs.SendImageRequest) (response structs.SendImageResponse, err error) {
 	utils.MustLogin(service.WaCli)
 
-	var (
+	/*var (
 		imagePath      string
 		imageThumbnail string
 		deletedItems   []string
@@ -135,13 +130,14 @@ func (service SendServiceImpl) SendImage(c *fiber.Ctx, request structs.SendImage
 	} else {
 		response.Status = fmt.Sprintf("Message sent to %s (server timestamp: %s)", request.Phone, ts)
 		return response, nil
-	}
+	}*/
+	return response, nil
 }
 
 func (service SendServiceImpl) SendFile(c *fiber.Ctx, request structs.SendFileRequest) (response structs.SendFileResponse, err error) {
 	utils.MustLogin(service.WaCli)
 
-	oriFilePath := fmt.Sprintf("%s/%s", config.PathSendItems, request.File.Filename)
+	/*oriFilePath := fmt.Sprintf("%s/%s", config.PathSendItems, request.File.Filename)
 	err = c.SaveFile(request.File, oriFilePath)
 	if err != nil {
 		return response, err
@@ -185,13 +181,14 @@ func (service SendServiceImpl) SendFile(c *fiber.Ctx, request structs.SendFileRe
 	} else {
 		response.Status = fmt.Sprintf("Document sent to %s (server timestamp: %s)", request.Phone, ts)
 		return response, nil
-	}
+	}*/
+	return response, nil
 }
 
 func (service SendServiceImpl) SendVideo(c *fiber.Ctx, request structs.SendVideoRequest) (response structs.SendVideoResponse, err error) {
 	utils.MustLogin(service.WaCli)
 
-	var (
+	/*var (
 		videoPath      string
 		videoThumbnail string
 		deletedItems   []string
@@ -284,5 +281,6 @@ func (service SendServiceImpl) SendVideo(c *fiber.Ctx, request structs.SendVideo
 	} else {
 		response.Status = fmt.Sprintf("Video sent to %s (server timestamp: %s)", request.Phone, ts)
 		return response, nil
-	}
+	}*/
+	return response, nil
 }

@@ -7,25 +7,31 @@ import (
 	"github.com/gofiber/fiber/v2"
 	fiberutils "github.com/gofiber/fiber/v2/utils"
 	"github.com/pfthink/whatsmeow"
+	"github.com/pfthink/whatsmeow/store/sqlstore"
 	"github.com/skip2/go-qrcode"
 	"os"
 	"path/filepath"
 	"time"
 	"whatsappproxy/config"
 	"whatsappproxy/structs"
+	"whatsappproxy/utils"
 )
 
 type AppServiceImpl struct {
-	WaCli *whatsmeow.Client
+	WaCli          *whatsmeow.Client
+	storeContainer *sqlstore.Container
 }
 
-func NewAppService(waCli *whatsmeow.Client) AppService {
+func NewAppService(storeContainer *sqlstore.Container) AppService {
 	return &AppServiceImpl{
-		WaCli: waCli,
+		storeContainer: storeContainer,
 	}
 }
 
 func (service AppServiceImpl) Login(c *fiber.Ctx) (response structs.LoginResponse, err error) {
+	jidUser := c.Query("jid")
+	service.WaCli = utils.InitWaCLIByJidUser(jidUser, service.storeContainer)
+
 	if service.WaCli == nil {
 		return response, errors.New("wa cli nil cok")
 	}
@@ -84,6 +90,12 @@ func (service AppServiceImpl) Login(c *fiber.Ctx) (response structs.LoginRespons
 }
 
 func (service AppServiceImpl) Logout(c *fiber.Ctx) (err error) {
+	jidUser := c.Query("jid")
+	service.WaCli = utils.InitWaCLIByJidUser(jidUser, service.storeContainer)
+	if service.WaCli == nil {
+		return errors.New("wa cli nil cok")
+	}
+
 	// delete history
 	files, err := filepath.Glob("./history-*")
 	if err != nil {
@@ -114,6 +126,11 @@ func (service AppServiceImpl) Logout(c *fiber.Ctx) (err error) {
 }
 
 func (service AppServiceImpl) Reconnect(c *fiber.Ctx) (err error) {
+	jidUser := c.Query("jid")
+	service.WaCli = utils.InitWaCLIByJidUser(jidUser, service.storeContainer)
+	if service.WaCli == nil {
+		return errors.New("wa cli nil cok")
+	}
 	service.WaCli.Disconnect()
 	return service.WaCli.Connect()
 }

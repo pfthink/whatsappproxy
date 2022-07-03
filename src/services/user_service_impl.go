@@ -5,32 +5,46 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pfthink/whatsmeow"
+	"github.com/pfthink/whatsmeow/store/sqlstore"
 	"github.com/pfthink/whatsmeow/types"
 	"whatsappproxy/structs"
 	"whatsappproxy/utils"
 )
 
 type UserServiceImpl struct {
-	WaCli *whatsmeow.Client
+	WaCli          *whatsmeow.Client
+	storeContainer *sqlstore.Container
 }
 
-func NewUserService(waCli *whatsmeow.Client) UserService {
+func NewUserService(storeContainer *sqlstore.Container) UserService {
 	return &UserServiceImpl{
-		WaCli: waCli,
+		storeContainer: storeContainer,
 	}
 }
 
-func (service UserServiceImpl) UserInfo(_ *fiber.Ctx, request structs.UserInfoRequest) (response structs.UserInfoResponse, err error) {
-	utils.MustLogin(service.WaCli)
-
-	var jids []types.JID
+func (service *UserServiceImpl) UserInfo(_ *fiber.Ctx, request structs.UserInfoRequest) (response structs.UserInfoResponse, err error) {
+	cliMap := utils.GetCliMap()
 	jid, ok := utils.ParseJID(request.Phone)
+	cli, exists := cliMap[jid.User]
+	if !exists {
+		client := utils.InitWaCLIByJidUser(jid.User, service.storeContainer)
+		cliMap[jid.User] = client
+		cli = client
+	}
+
+	utils.MustLogin(cli)
+
+	phones := []string{"+" + jid.User}
+	res, err := cli.IsOnWhatsApp(phones)
+	fmt.Println(res)
+	var jids []types.JID
+	//jid, ok := utils.ParseJID(request.Phone)
 	if !ok {
 		return response, errors.New("invalid JID " + request.Phone)
 	}
 
 	jids = append(jids, jid)
-	resp, err := service.WaCli.GetUserInfo(jids)
+	resp, err := cli.GetUserInfo(jids)
 	if err != nil {
 		return response, err
 	}
@@ -61,14 +75,26 @@ func (service UserServiceImpl) UserInfo(_ *fiber.Ctx, request structs.UserInfoRe
 	return response, nil
 }
 
-func (service UserServiceImpl) UserAvatar(_ *fiber.Ctx, request structs.UserAvatarRequest) (response structs.UserAvatarResponse, err error) {
-	utils.MustLogin(service.WaCli)
-
+func (service *UserServiceImpl) UserAvatar(_ *fiber.Ctx, request structs.UserAvatarRequest) (response structs.UserAvatarResponse, err error) {
 	jid, ok := utils.ParseJID(request.Phone)
+	cliMap := utils.GetCliMap()
+	cli, exists := cliMap[jid.User]
+	if !exists {
+		client := utils.InitWaCLIByJidUser(jid.User, service.storeContainer)
+		cliMap[jid.User] = client
+		cli = client
+	}
+	utils.MustLogin(cli)
+
+	/*if service.WaCli == nil {
+		return response, errors.New("wa cli nil cok")
+	}*/
+
+	//jid, ok := utils.ParseJID(request.Phone)
 	if !ok {
 		return response, errors.New("invalid JID " + request.Phone)
 	}
-	pic, err := service.WaCli.GetProfilePictureInfo(jid, false)
+	pic, err := cli.GetProfilePictureInfo(jid, false)
 	if err != nil {
 		return response, err
 	} else if pic == nil {

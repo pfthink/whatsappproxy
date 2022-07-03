@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -27,7 +26,12 @@ var (
 	log           waLog.Logger
 	historySyncID int32
 	startupTime   = time.Now().Unix()
+	cliMap        = make(map[string]*whatsmeow.Client)
 )
+
+func GetCliMap() map[string]*whatsmeow.Client {
+	return cliMap
+}
 
 func GetPlatformName(deviceID int) string {
 	switch deviceID {
@@ -112,12 +116,28 @@ func InitWaCLI(storeContainer *sqlstore.Container) *whatsmeow.Client {
 	return cli
 }
 
+func InitWaCLIByJidUser(jidUser string, storeContainer *sqlstore.Container) *whatsmeow.Client {
+	device, err := storeContainer.GetDeviceByJidUser(jidUser)
+	if err != nil {
+		log.Errorf("Failed to get device: %v", err)
+		panic(err)
+	}
+
+	store.DeviceProps.PlatformType = waProto.DeviceProps_CHROME.Enum()
+	store.DeviceProps.Os = proto.String("AldinoKemal")
+	cli = whatsmeow.NewClient(device, waLog.Stdout("Client", config.WhatsappLogLevel, true))
+	cli.AddEventHandler(handler)
+
+	return cli
+}
+
 func MustLogin(waCli *whatsmeow.Client) {
 	if !waCli.IsConnected() {
-		panic(AuthError{Message: "you are not connect to whatsapp server, please reconnect"})
-	} else if !waCli.IsLoggedIn() {
-		panic(AuthError{Message: "you are not login"})
-	}
+		waCli.Connect()
+		//panic(AuthError{Message: "you are not connect to whatsapp server, please reconnect"})
+	} //else if !waCli.IsLoggedIn() {
+	//panic(AuthError{Message: "you are not login"})
+	//}
 }
 
 func handler(rawEvt interface{}) {
@@ -132,10 +152,6 @@ func handler(rawEvt interface{}) {
 			}
 		}
 	case *events.Connected, *events.PushNameSetting:
-		noise := base64.StdEncoding.EncodeToString(cli.Store.NoiseKey.Pub[:])
-		identity := base64.StdEncoding.EncodeToString(cli.Store.IdentityKey.Pub[:])
-		adv := base64.StdEncoding.EncodeToString(cli.Store.AdvSecretKey)
-		fmt.Printf("Jid:%s, Connected ,noise:%s,- identity:%s -adv:%s ", cli.Store.ID, noise, identity, adv)
 		if len(cli.Store.PushName) == 0 {
 			return
 		}
