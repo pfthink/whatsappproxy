@@ -27,11 +27,11 @@ func (controller *AppController) Login(c *fiber.Ctx) error {
 
 	return c.JSON(utils.ResponseData{
 		Code:    200,
-		Message: "Success",
-		Results: map[string]interface{}{
-			"qr_link":     fmt.Sprintf("%s://%s/%s", c.Protocol(), c.Hostname(), response.ImagePath),
-			"code":        response.Code,
-			"qr_duration": response.Duration,
+		Message: "success",
+		Data: map[string]interface{}{
+			"qr_link":        fmt.Sprintf("%s://%s/%s", c.Protocol(), c.Hostname(), response.ImagePath),
+			"qrcode":         response.Code,
+			"qrcodeDuration": response.Duration,
 		},
 	})
 }
@@ -42,8 +42,8 @@ func (controller *AppController) Logout(c *fiber.Ctx) error {
 
 	return c.JSON(utils.ResponseData{
 		Code:    200,
-		Message: "Success logout",
-		Results: nil,
+		Message: "success",
+		Data:    nil,
 	})
 }
 
@@ -53,7 +53,7 @@ func (controller *AppController) Reconnect(c *fiber.Ctx) error {
 
 	return c.JSON(utils.ResponseData{
 		Code:    200,
-		Message: "Reconnect success",
-		Results: nil,
+		Message: "success",
+		Data:    nil,
 	})
 }

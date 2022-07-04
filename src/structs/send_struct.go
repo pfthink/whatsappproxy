@@ -16,7 +16,8 @@ type SendMessageRequest struct {
 }
 
 type SendMessageResponse struct {
-	Status string `json:"status"`
+	Status    string `json:"status"`
+	MessageId string `json:"messageId"`
 }
 
 type SendImageRequest struct {

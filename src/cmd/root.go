@@ -5,7 +5,8 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/nacos-group/nacos-sdk-go/common/logger"
+	//"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html"
 	"github.com/markbates/pkger"
 	_ "github.com/mattn/go-sqlite3"
@@ -13,6 +14,7 @@ import (
 	"os"
 	"whatsappproxy/config"
 	"whatsappproxy/controllers"
+	"whatsappproxy/discovery"
 	"whatsappproxy/middleware"
 	"whatsappproxy/services"
 	"whatsappproxy/utils"
@@ -55,7 +57,7 @@ func runRest(cmd *cobra.Command, args []string) {
 	app.Static("/statics", "./statics")
 	app.Use(middleware.Recovery())
 	if config.AppDebug {
-		app.Use(logger.New())
+		app.Use(logger.GetLogger())
 	}
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
@@ -88,9 +90,14 @@ func runRest(cmd *cobra.Command, args []string) {
 		})
 	})
 
+	//register service
+	discovery.InitNacos()
+
 	err = app.Listen(":" + config.AppPort)
+	logger.Infof("xxx")
 	if err != nil {
-		log.Fatalln("Failed to start: ", err.Error())
+		logger.Errorf("Failed to start: ", err.Error())
+		//log.Fatalln("Failed to start: ", err.Error())
 	}
 }
 

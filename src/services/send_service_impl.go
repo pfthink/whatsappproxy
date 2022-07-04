@@ -24,17 +24,26 @@ func NewSendService(storeContainer *sqlstore.Container) SendService {
 }
 
 func (service SendServiceImpl) SendText(_ *fiber.Ctx, request structs.SendMessageRequest) (response structs.SendMessageResponse, err error) {
-	utils.MustLogin(service.WaCli)
+	cliMap := utils.GetCliMap()
+	jid, ok := utils.ParseJID(request.Phone)
+	cli, exists := cliMap[jid.User]
+	if !exists {
+		client := utils.InitWaCLIByJidUser(jid.User, service.storeContainer)
+		cliMap[jid.User] = client
+		cli = client
+	}
+	utils.MustLogin(cli)
 	recipient, ok := utils.ParseJID(request.Phone)
 	if !ok {
 		return response, errors.New("invalid JID " + request.Phone)
 	}
 	msg := &waProto.Message{Conversation: proto.String(request.Message)}
 	msgId := whatsmeow.GenerateMessageID()
-	ts, err := service.WaCli.SendMessage(recipient, msgId, msg)
+	ts, err := cli.SendMessage(recipient, msgId, msg)
 	if err != nil {
 		return response, err
 	} else {
+		response.MessageId = msgId
 		response.Status = fmt.Sprintf("Message sent to %s (server timestamp: %s),msgId:%s", request.Phone, ts, msgId)
 	}
 	return response, nil

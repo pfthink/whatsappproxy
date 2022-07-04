@@ -10,7 +10,10 @@ var (
 	PathQrCode    string = "statics/qrcode"
 	PathSendItems string = "statics/senditems"
 
-	DBName string = "hydrogenWaCli.db"
+	DBName      string = "hydrogenWaCli.db"
+	ServiceName        = "whatsappproxy"
+	//TODO
+	NamespaceId = "dev25"
 
 	WhatsappLogLevel            string = "ERROR"
 	WhatsappAutoReplyMessage    string
