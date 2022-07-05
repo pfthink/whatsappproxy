@@ -23,7 +23,7 @@ func NewUserService(storeContainer *sqlstore.Container) UserService {
 }
 
 func (service *UserServiceImpl) UserInfo(_ *fiber.Ctx, request structs.UserInfoRequest) (response structs.UserInfoResponse, err error) {
-	cliMap := utils.GetCliMap()
+	cliMap := utils.CliMap
 	jid, ok := utils.ParseJID(request.Phone)
 	cli, exists := cliMap[jid.User]
 	if !exists {
@@ -77,7 +77,7 @@ func (service *UserServiceImpl) UserInfo(_ *fiber.Ctx, request structs.UserInfoR
 
 func (service *UserServiceImpl) UserAvatar(_ *fiber.Ctx, request structs.UserAvatarRequest) (response structs.UserAvatarResponse, err error) {
 	jid, ok := utils.ParseJID(request.Phone)
-	cliMap := utils.GetCliMap()
+	cliMap := utils.CliMap
 	cli, exists := cliMap[jid.User]
 	if !exists {
 		client := utils.InitWaCLIByJidUser(jid.User, service.storeContainer)

@@ -24,7 +24,7 @@ func NewSendService(storeContainer *sqlstore.Container) SendService {
 }
 
 func (service SendServiceImpl) SendText(_ *fiber.Ctx, request structs.SendMessageRequest) (response structs.SendMessageResponse, err error) {
-	cliMap := utils.GetCliMap()
+	cliMap := utils.CliMap
 	jid, ok := utils.ParseJID(request.Phone)
 	cli, exists := cliMap[jid.User]
 	if !exists {

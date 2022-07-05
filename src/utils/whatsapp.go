@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/pfthink/agollo"
 	"github.com/pfthink/whatsmeow"
 	"github.com/pfthink/whatsmeow/appstate"
 	waProto "github.com/pfthink/whatsmeow/binary/proto"
@@ -26,12 +27,9 @@ var (
 	log           waLog.Logger
 	historySyncID int32
 	startupTime   = time.Now().Unix()
-	cliMap        = make(map[string]*whatsmeow.Client)
+	CliMap        = make(map[string]*whatsmeow.Client)
+	ApolloClient  agollo.Client
 )
-
-func GetCliMap() map[string]*whatsmeow.Client {
-	return cliMap
-}
 
 func GetPlatformName(deviceID int) string {
 	switch deviceID {

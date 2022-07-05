@@ -6,6 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/nacos-group/nacos-sdk-go/common/logger"
+	"whatsappproxy/discovery"
+
 	//"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html"
 	"github.com/markbates/pkger"
@@ -14,7 +16,6 @@ import (
 	"os"
 	"whatsappproxy/config"
 	"whatsappproxy/controllers"
-	"whatsappproxy/discovery"
 	"whatsappproxy/middleware"
 	"whatsappproxy/services"
 	"whatsappproxy/utils"
@@ -64,6 +65,14 @@ func runRest(cmd *cobra.Command, args []string) {
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 
+	//register service
+	discovery.InitNacos()
+	//init apollo
+	utils.ApolloClient = config.InitApollo()
+
+	//value := utils.ApolloClient.GetConfig("DevCenter.atta-mq")
+	//logger.Info(value.GetValue("spring.rabbitmq.host"))
+
 	db := utils.InitWaDB()
 	//cli := utils.InitWaCLI(db)
 
@@ -89,9 +98,6 @@ func runRest(cmd *cobra.Command, args []string) {
 			"MaxVideoSize": humanize.Bytes(uint64(config.WhatsappSettingMaxVideoSize)),
 		})
 	})
-
-	//register service
-	discovery.InitNacos()
 
 	err = app.Listen(":" + config.AppPort)
 	logger.Infof("xxx")
