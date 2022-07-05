@@ -16,9 +16,9 @@ func NewAppController(service services.AppService) AppController {
 }
 
 func (controller *AppController) Route(app *fiber.App) {
-	app.Get("/app/login", controller.Login)
-	app.Get("/app/logout", controller.Logout)
-	app.Get("/app/reconnect", controller.Reconnect)
+	app.Post("/whatsappproxy/app/qrcode", controller.Login)
+	app.Post("/whatsappproxy/app/logout", controller.Logout)
+	app.Post("/whatsappproxy/app/reconnect", controller.Reconnect)
 }
 
 func (controller *AppController) Login(c *fiber.Ctx) error {
@@ -26,9 +26,10 @@ func (controller *AppController) Login(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: "success",
-		Data: map[string]interface{}{
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value: map[string]interface{}{
 			"qr_link":        fmt.Sprintf("%s://%s/%s", c.Protocol(), c.Hostname(), response.ImagePath),
 			"qrcode":         response.Code,
 			"qrcodeDuration": response.Duration,
@@ -41,9 +42,10 @@ func (controller *AppController) Logout(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: "success",
-		Data:    nil,
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        nil,
 	})
 }
 
@@ -52,8 +54,9 @@ func (controller *AppController) Reconnect(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: "success",
-		Data:    nil,
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        nil,
 	})
 }

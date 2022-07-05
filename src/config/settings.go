@@ -13,7 +13,7 @@ var (
 	DBName      string = "hydrogenWaCli.db"
 	ServiceName        = "whatsappproxy"
 	//TODO
-	NamespaceId = "dev25"
+	NamespaceId = "sit24"
 
 	WhatsappLogLevel            string = "ERROR"
 	WhatsappAutoReplyMessage    string

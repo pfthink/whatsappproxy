@@ -17,10 +17,10 @@ func NewSendController(service services.SendService) SendController {
 }
 
 func (controller *SendController) Route(app *fiber.App) {
-	app.Post("/send/message", controller.SendText)
-	app.Post("/send/image", controller.SendImage)
-	app.Post("/send/file", controller.SendFile)
-	app.Post("/send/video", controller.SendVideo)
+	app.Post("/whatsappproxy/send/text", controller.SendText)
+	app.Post("/whatsappproxy/send/image", controller.SendImage)
+	app.Post("/whatsappproxy/send/file", controller.SendFile)
+	app.Post("whatsappproxy//send/video", controller.SendVideo)
 }
 
 func (controller *SendController) SendText(c *fiber.Ctx) error {
@@ -41,9 +41,10 @@ func (controller *SendController) SendText(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: response.Status,
-		Data:    response,
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        response,
 	})
 }
 
@@ -72,9 +73,10 @@ func (controller *SendController) SendImage(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: response.Status,
-		Data:    response,
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        response,
 	})
 }
 
@@ -101,9 +103,10 @@ func (controller *SendController) SendFile(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: response.Status,
-		Data:    response,
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        response,
 	})
 }
 
@@ -130,8 +133,9 @@ func (controller *SendController) SendVideo(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: response.Status,
-		Data:    response,
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        response,
 	})
 }

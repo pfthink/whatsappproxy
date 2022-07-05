@@ -17,10 +17,10 @@ func NewUserController(service services.UserService) UserController {
 }
 
 func (controller *UserController) Route(app *fiber.App) {
-	app.Get("/user/info", controller.UserInfo)
-	app.Get("/user/avatar", controller.UserAvatar)
-	app.Get("/user/my/privacy", controller.UserMyPrivacySetting)
-	app.Get("/user/my/groups", controller.UserMyListGroups)
+	app.Post("/whatsappproxy/user/info", controller.UserInfo)
+	app.Post("/whatsappproxy/user/avatar", controller.UserAvatar)
+	app.Post("/whatsappproxy/user/my/privacy", controller.UserMyPrivacySetting)
+	app.Post("/whatsappproxy/user/my/groups", controller.UserMyListGroups)
 }
 
 func (controller *UserController) UserInfo(c *fiber.Ctx) error {
@@ -36,9 +36,10 @@ func (controller *UserController) UserInfo(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: "success",
-		Data:    response.Data[0],
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        response.Data[0],
 	})
 }
 
@@ -55,9 +56,10 @@ func (controller *UserController) UserAvatar(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: "success",
-		Data:    response,
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        response,
 	})
 }
 
@@ -66,9 +68,10 @@ func (controller *UserController) UserMyPrivacySetting(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: "success",
-		Data:    response,
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        response,
 	})
 }
 
@@ -77,8 +80,9 @@ func (controller *UserController) UserMyListGroups(c *fiber.Ctx) error {
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
-		Code:    200,
-		Message: "success",
-		Data:    response,
+		Code:         200,
+		Succeeded:    true,
+		ResponseCode: "SUCCESS",
+		Value:        response,
 	})
 }
