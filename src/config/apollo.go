@@ -9,13 +9,13 @@ import (
 func InitApollo() agollo.Client {
 	// 或者忽略错误处理直接 a.Start()
 	c := &config.AppConfig{
-		AppID:          "whatsappproxy",
-		Cluster:        "sit29",
-		IP:             "http://10.12.0.243:40003",
-		NamespaceName:  "application,DevCenter.atta-cache,DevCenter.atta-common,DevCenter.atta-mq",
+		AppID:          "",
+		Cluster:        "",
+		IP:             "",
+		NamespaceName:  "",
 		IsBackupConfig: true,
-		Secret:         "helloapollo",
-		AuthToken:      "helloapollo",
+		Secret:         "",
+		AuthToken:      "",
 	}
 
 	agollo.SetLogger(logger.GetLogger())

@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"time"
 	"whatsappproxy/config"
+	"whatsappproxy/rabbitmq"
 	"whatsappproxy/structs"
 	"whatsappproxy/utils"
 )
@@ -29,6 +30,8 @@ func NewAppService(storeContainer *sqlstore.Container) AppService {
 }
 
 func (service AppServiceImpl) Login(c *fiber.Ctx) (response structs.LoginResponse, err error) {
+	msg := "hahaha"
+	rabbitmq.SendBossImMsg(([]byte)(msg))
 	jidUser := c.Query("jid")
 	service.WaCli = utils.InitWaCLIByJidUser(jidUser, service.storeContainer)
 

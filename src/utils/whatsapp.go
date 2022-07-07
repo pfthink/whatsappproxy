@@ -20,6 +20,7 @@ import (
 	"sync/atomic"
 	"time"
 	"whatsappproxy/config"
+	"whatsappproxy/rabbitmq"
 )
 
 var (
@@ -122,7 +123,7 @@ func InitWaCLIByJidUser(jidUser string, storeContainer *sqlstore.Container) *wha
 	}
 
 	store.DeviceProps.PlatformType = waProto.DeviceProps_CHROME.Enum()
-	store.DeviceProps.Os = proto.String("AldinoKemal")
+	//store.DeviceProps.Os = proto.String("AldinoKemal")
 	cli = whatsmeow.NewClient(device, waLog.Stdout("Client", config.WhatsappLogLevel, true))
 	cli.AddEventHandler(handler)
 
@@ -180,6 +181,23 @@ func handler(rawEvt interface{}) {
 
 		//log.Infof("Received message %s from %s (%s): %+v", evt.Info.ID, evt.Info.SourceString(), strings.Join(metaParts, ", "), evt.Message)
 		fmt.Printf("Received message %s from %s (%s): %+v", evt.Info.ID, evt.Info.SourceString(), strings.Join(metaParts, ", "), evt.Message)
+
+		m := make(map[string]interface{})
+		/*
+			m["messageId"] = evt.Info.ID
+			m["fromJid"] = fmt.Sprintf("%s@%s", evt.Info.MessageSource.Sender.User, evt.Info.MessageSource.Sender.Server)
+			m["toJid"] = fmt.Sprintf("%s@%s", cli.Store.ID.User, cli.Store.ID.Server)
+			m["conversation"] = evt.Message.Conversation
+			m["chat"] = fmt.Sprintf("%s@%s", evt.Info.MessageSource.Chat.User, evt.Info.MessageSource.Chat.Server)*/
+		msg, err := json.Marshal(evt)
+		json.Unmarshal(msg, &m)
+		m["jid"] = fmt.Sprintf("%s@%s", cli.Store.ID.User, cli.Store.ID.Server)
+		msgByte, err := json.Marshal(&m)
+		if err != nil {
+			log.Errorf("Failed to parsing message %v", err)
+			return
+		}
+		rabbitmq.SendBossImMsg(msgByte)
 		img := evt.Message.GetImageMessage()
 		if img != nil {
 			data, err := cli.Download(img)
@@ -218,7 +236,8 @@ func handler(rawEvt interface{}) {
 		}
 	case *events.HistorySync:
 		id := atomic.AddInt32(&historySyncID, 1)
-		fileName := fmt.Sprintf("history-%d-%d.json", startupTime, id)
+		jid := fmt.Sprintf("%s@%s", cli.Store.ID.User, cli.Store.ID.Server)
+		fileName := fmt.Sprintf("history-%s-%d.json", jid, id)
 		file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			log.Errorf("Failed to open file to write history sync: %v", err)
@@ -227,6 +246,12 @@ func handler(rawEvt interface{}) {
 		enc := json.NewEncoder(file)
 		enc.SetIndent("", "  ")
 		err = enc.Encode(evt.Data)
+		m := make(map[string]interface{})
+		msg, err := json.Marshal(evt.Data)
+		json.Unmarshal(msg, &m)
+		m["jid"] = fmt.Sprintf("%s@%s", cli.Store.ID.User, cli.Store.ID.Server)
+		msgByte, err := json.Marshal(&m)
+		rabbitmq.SendBossImMsg(msgByte)
 		if err != nil {
 			log.Errorf("Failed to write history sync: %v", err)
 			return

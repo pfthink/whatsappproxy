@@ -7,35 +7,30 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/nacos-group/nacos-sdk-go/common/logger"
 	"whatsappproxy/discovery"
+	"whatsappproxy/rabbitmq"
 
-	//"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/template/html"
-	"github.com/markbates/pkger"
 	_ "github.com/mattn/go-sqlite3"
-	"log"
+	"github.com/spf13/cobra"
 	"os"
 	"whatsappproxy/config"
 	"whatsappproxy/controllers"
 	"whatsappproxy/middleware"
 	"whatsappproxy/services"
 	"whatsappproxy/utils"
-
-	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Short: "Send free whatsapp API",
-	Long: `This application is from clone https://github.com/aldinokemal/go-whatsapp-web-multidevice, 
-you can send whatsapp over http api but your whatsapp account have to be multi device version`,
-	Run: runRest,
+	Short: "Whatsapp API",
+	Long:  `you can send whatsapp over http api but your whatsapp account have to be multi device version`,
+	Run:   runRest,
 }
 
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.PersistentFlags().StringVarP(&config.AppPort, "port", "p", config.AppPort, "change port number with --port <number> | example: --port=8080")
 	rootCmd.PersistentFlags().BoolVarP(&config.AppDebug, "debug", "d", config.AppDebug, "hide or displaying log with --debug <true/false> | example: --debug=true")
-	rootCmd.PersistentFlags().StringVarP(&config.WhatsappAutoReplyMessage, "autoreply", "", config.WhatsappAutoReplyMessage, `auto reply when received message --autoreply <string> | example: --autoreply="Don't reply this message"`)
+	rootCmd.PersistentFlags().StringVarP(&config.WhatsappAutoReplyMessage, "autoreply", "", config.WhatsappAutoReplyMessage, `auto reply when received message --autoreply <string>`)
 }
 
 func runRest(cmd *cobra.Command, args []string) {
@@ -43,19 +38,14 @@ func runRest(cmd *cobra.Command, args []string) {
 		config.WhatsappLogLevel = "DEBUG"
 	}
 
-	// TODO: Init Rest App
 	//preparing folder if not exist
 	err := utils.CreateFolder(config.PathQrCode, config.PathSendItems)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Error(err)
 	}
 
-	engine := html.NewFileSystem(pkger.Dir("/views"), ".html")
-	app := fiber.New(fiber.Config{
-		Views:     engine,
-		BodyLimit: 50 * 1024 * 1024,
-	})
-	app.Static("/statics", "./statics")
+	app := fiber.New()
+
 	app.Use(middleware.Recovery())
 	if config.AppDebug {
 		app.Use(logger.GetLogger())
@@ -65,16 +55,17 @@ func runRest(cmd *cobra.Command, args []string) {
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 
-	//register service
+	// register service
 	discovery.InitNacos()
-	//init apollo
-	utils.ApolloClient = config.InitApollo()
+	// init apollo
+	//utils.ApolloClient = config.InitApollo()
+	// init rabbitMq
+	imRabbitMq := rabbitmq.InitBossRabbitMq()
+	imRabbitMq.MqConnect()
 
-	//value := utils.ApolloClient.GetConfig("DevCenter.atta-mq")
+	//value := utils.ApolloClient.GetConfig("DevCenter.atta-rabbitmq")
 	//logger.Info(value.GetValue("spring.rabbitmq.host"))
-
 	db := utils.InitWaDB()
-	//cli := utils.InitWaCLI(db)
 
 	// Service
 	appService := services.NewAppService(db)
@@ -103,7 +94,6 @@ func runRest(cmd *cobra.Command, args []string) {
 	logger.Infof("xxx")
 	if err != nil {
 		logger.Errorf("Failed to start: ", err.Error())
-		//log.Fatalln("Failed to start: ", err.Error())
 	}
 }
 

@@ -13,7 +13,7 @@ func InitNacos() {
 	sc := []constant.ServerConfig{
 		{
 			Scheme: "https",
-			IpAddr: "nacos.xtrfr.cn",
+			IpAddr: "",
 			Port:   443,
 		},
 	}
