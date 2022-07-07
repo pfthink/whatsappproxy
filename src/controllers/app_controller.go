@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"whatsappproxy/services"
+	"whatsappproxy/structs"
 	"whatsappproxy/utils"
 )
 
@@ -16,13 +17,13 @@ func NewAppController(service services.AppService) AppController {
 }
 
 func (controller *AppController) Route(app *fiber.App) {
-	app.Post("/whatsappproxy/app/qrcode", controller.Login)
-	app.Post("/whatsappproxy/app/logout", controller.Logout)
-	app.Post("/whatsappproxy/app/reconnect", controller.Reconnect)
+	app.Post("/whatsappproxy/app/qrcode", controller.GetQrcode)
+
+	app.Post("/whatsappproxy/app/qrcode/scan/status", controller.GetQrcodeScanStatus)
 }
 
-func (controller *AppController) Login(c *fiber.Ctx) error {
-	response, err := controller.Service.Login(c)
+func (controller *AppController) GetQrcode(c *fiber.Ctx) error {
+	response, err := controller.Service.GetQrcode(c)
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
@@ -37,26 +38,21 @@ func (controller *AppController) Login(c *fiber.Ctx) error {
 	})
 }
 
-func (controller *AppController) Logout(c *fiber.Ctx) error {
-	err := controller.Service.Logout(c)
+func (controller *AppController) GetQrcodeScanStatus(c *fiber.Ctx) error {
+
+	var request structs.QrcodeScanStatus
+	c.BodyParser(&request)
+
+	response, err := controller.Service.QrcodeScanStatus(c, request)
 	utils.PanicIfNeeded(err)
 
 	return c.JSON(utils.ResponseData{
 		Code:         200,
 		Succeeded:    true,
 		ResponseCode: "SUCCESS",
-		Value:        nil,
-	})
-}
-
-func (controller *AppController) Reconnect(c *fiber.Ctx) error {
-	err := controller.Service.Reconnect(c)
-	utils.PanicIfNeeded(err)
-
-	return c.JSON(utils.ResponseData{
-		Code:         200,
-		Succeeded:    true,
-		ResponseCode: "SUCCESS",
-		Value:        nil,
+		Value: map[string]interface{}{
+			"loginStatus": response.LoginStatus,
+			"jid":         response.Jid,
+		},
 	})
 }

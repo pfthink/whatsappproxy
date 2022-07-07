@@ -7,6 +7,8 @@ import (
 	"github.com/pfthink/whatsmeow"
 	"github.com/pfthink/whatsmeow/store/sqlstore"
 	"github.com/pfthink/whatsmeow/types"
+	"os"
+	"path/filepath"
 	"whatsappproxy/structs"
 	"whatsappproxy/utils"
 )
@@ -22,7 +24,53 @@ func NewUserService(storeContainer *sqlstore.Container) UserService {
 	}
 }
 
-func (service *UserServiceImpl) UserInfo(_ *fiber.Ctx, request structs.UserInfoRequest) (response structs.UserInfoResponse, err error) {
+func (service UserServiceImpl) Logout(c *fiber.Ctx, request structs.UserRequest) (err error) {
+	jid, _ := utils.ParseJID(request.Phone)
+	service.WaCli = utils.InitWaCLIByJidUser(jid.User, service.storeContainer)
+	if service.WaCli == nil {
+		return errors.New("wa cli nil cok")
+	}
+
+	// delete history
+	files, err := filepath.Glob("./history-*")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, f := range files {
+		err = os.Remove(f)
+		if err != nil {
+			return err
+		}
+	}
+	// delete qr images
+	qrImages, err := filepath.Glob("./statics/images/qrcode/scan-*")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, f := range qrImages {
+		err = os.Remove(f)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = service.WaCli.Logout()
+	return
+}
+
+func (service UserServiceImpl) Reconnect(c *fiber.Ctx, request structs.UserRequest) (err error) {
+	jid, _ := utils.ParseJID(request.Phone)
+	service.WaCli = utils.InitWaCLIByJidUser(jid.User, service.storeContainer)
+	if service.WaCli == nil {
+		return errors.New("wa cli nil cok")
+	}
+	service.WaCli.Disconnect()
+	return service.WaCli.Connect()
+}
+
+func (service *UserServiceImpl) UserInfo(_ *fiber.Ctx, request structs.UserRequest) (response structs.UserInfoResponse, err error) {
 	cliMap := utils.CliMap
 	jid, ok := utils.ParseJID(request.Phone)
 	cli, exists := cliMap[jid.User]

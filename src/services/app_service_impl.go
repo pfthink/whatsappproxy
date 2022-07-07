@@ -10,10 +10,8 @@ import (
 	"github.com/pfthink/whatsmeow/store/sqlstore"
 	"github.com/skip2/go-qrcode"
 	"os"
-	"path/filepath"
 	"time"
 	"whatsappproxy/config"
-	"whatsappproxy/rabbitmq"
 	"whatsappproxy/structs"
 	"whatsappproxy/utils"
 )
@@ -29,11 +27,8 @@ func NewAppService(storeContainer *sqlstore.Container) AppService {
 	}
 }
 
-func (service AppServiceImpl) Login(c *fiber.Ctx) (response structs.LoginResponse, err error) {
-	msg := "hahaha"
-	rabbitmq.SendBossImMsg(([]byte)(msg))
-	jidUser := c.Query("jid")
-	service.WaCli = utils.InitWaCLIByJidUser(jidUser, service.storeContainer)
+func (service AppServiceImpl) GetQrcode(c *fiber.Ctx) (response structs.LoginResponse, err error) {
+	service.WaCli = utils.NewWaCLI(service.storeContainer)
 
 	if service.WaCli == nil {
 		return response, errors.New("wa cli nil cok")
@@ -92,48 +87,13 @@ func (service AppServiceImpl) Login(c *fiber.Ctx) (response structs.LoginRespons
 	return response, nil
 }
 
-func (service AppServiceImpl) Logout(c *fiber.Ctx) (err error) {
-	jidUser := c.Query("jid")
-	service.WaCli = utils.InitWaCLIByJidUser(jidUser, service.storeContainer)
-	if service.WaCli == nil {
-		return errors.New("wa cli nil cok")
+func (service AppServiceImpl) QrcodeScanStatus(c *fiber.Ctx, request structs.QrcodeScanStatus) (response structs.ScanStatusResponse, err error) {
+	response.LoginStatus = 0
+	jid, _ := service.storeContainer.HasScanQrcode(request.NoiseKeyPub, request.IdentityKeyPub, request.AdvSecret)
+	if len(jid) != 0 {
+		response.LoginStatus = 1
+		JID, _ := utils.ParseJID(jid)
+		response.Jid = JID.User + "@" + JID.Server
 	}
-
-	// delete history
-	files, err := filepath.Glob("./history-*")
-	if err != nil {
-		panic(err)
-	}
-
-	for _, f := range files {
-		err = os.Remove(f)
-		if err != nil {
-			return err
-		}
-	}
-	// delete qr images
-	qrImages, err := filepath.Glob("./statics/images/qrcode/scan-*")
-	if err != nil {
-		panic(err)
-	}
-
-	for _, f := range qrImages {
-		err = os.Remove(f)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = service.WaCli.Logout()
-	return
-}
-
-func (service AppServiceImpl) Reconnect(c *fiber.Ctx) (err error) {
-	jidUser := c.Query("jid")
-	service.WaCli = utils.InitWaCLIByJidUser(jidUser, service.storeContainer)
-	if service.WaCli == nil {
-		return errors.New("wa cli nil cok")
-	}
-	service.WaCli.Disconnect()
-	return service.WaCli.Connect()
+	return response, nil
 }

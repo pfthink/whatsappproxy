@@ -7,7 +7,7 @@ import (
 	"whatsappproxy/utils"
 )
 
-func ValidateUserInfo(request structs.UserInfoRequest) {
+func ValidateUserInfo(request structs.UserRequest) {
 	err := validation.ValidateStruct(&request,
 		validation.Field(&request.Phone, validation.Required, is.E164, validation.Length(10, 15)),
 	)

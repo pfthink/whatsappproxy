@@ -130,6 +130,20 @@ func InitWaCLIByJidUser(jidUser string, storeContainer *sqlstore.Container) *wha
 	return cli
 }
 
+func NewWaCLI(storeContainer *sqlstore.Container) *whatsmeow.Client {
+	device, err := storeContainer.GenerateDevice()
+	if err != nil {
+		log.Errorf("Failed to get device: %v", err)
+		panic(err)
+	}
+	store.DeviceProps.PlatformType = waProto.DeviceProps_CHROME.Enum()
+	//store.DeviceProps.Os = proto.String("AldinoKemal")
+	cli = whatsmeow.NewClient(device, waLog.Stdout("Client", config.WhatsappLogLevel, true))
+	cli.AddEventHandler(handler)
+
+	return cli
+}
+
 func MustLogin(waCli *whatsmeow.Client) {
 	if !waCli.IsConnected() {
 		waCli.Connect()

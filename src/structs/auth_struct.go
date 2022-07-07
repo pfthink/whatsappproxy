@@ -9,3 +9,8 @@ type LoginResponse struct {
 	Duration  time.Duration `json:"duration"`
 	Code      string        `json:"code"`
 }
+
+type ScanStatusResponse struct {
+	LoginStatus int    `json:"loginStatus"`
+	Jid         string `json:"jid"`
+}

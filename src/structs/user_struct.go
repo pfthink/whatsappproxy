@@ -2,7 +2,7 @@ package structs
 
 import "github.com/pfthink/whatsmeow/types"
 
-type UserInfoRequest struct {
+type UserRequest struct {
 	Phone string `json:"phone" query:"phone"`
 }
 
