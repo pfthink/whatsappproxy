@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"whatsappproxy/config"
-	"whatsappproxy/controllers"
 	"whatsappproxy/middleware"
+	"whatsappproxy/routers"
 	"whatsappproxy/services"
 	"whatsappproxy/utils"
 )
@@ -73,9 +73,9 @@ func runRest(cmd *cobra.Command, args []string) {
 	userService := services.NewUserService(db)
 
 	// Controller
-	appController := controllers.NewAppController(appService)
-	sendController := controllers.NewSendController(sendService)
-	userController := controllers.NewUserController(userService)
+	appController := routers.NewAppController(appService)
+	sendController := routers.NewSendController(sendService)
+	userController := routers.NewUserController(userService)
 
 	appController.Route(app)
 	sendController.Route(app)
