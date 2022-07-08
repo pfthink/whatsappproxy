@@ -20,6 +20,6 @@ FROM alpine
 RUN apk update && apk add --no-cache vips-dev ffmpeg
 WORKDIR /app
 # Copy compiled from builder.
-COPY --from=builder /app/whatsapp /app/whatsapp
+COPY --from=builder /app/whatsappproxy /app/whatsappproxy
 # Run the binary.
-ENTRYPOINT ["/app/whatsapp"]
+ENTRYPOINT ["/app/whatsappproxy"]
