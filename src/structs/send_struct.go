@@ -10,23 +10,24 @@ const TypeUser SendType = "user"
 const TypeGroup SendType = "group"
 
 type SendMessageRequest struct {
-	Phone   string   `json:"phone" form:"phone"`
+	FromJid string   `json:"fromJid" form:"fromJid"`
+	ToJid   string   `json:"toJid" form:"toJid"`
 	Message string   `json:"message" form:"message"`
 	Type    SendType `json:"type" form:"type"`
 }
 
 type SendMessageResponse struct {
-	Status    string `json:"status"`
 	MessageId string `json:"messageId"`
 }
 
 type SendImageRequest struct {
-	Phone    string                `json:"phone" form:"phone"`
-	Caption  string                `json:"caption" form:"caption"`
-	Image    *multipart.FileHeader `json:"image" form:"image"`
-	ViewOnce bool                  `json:"view_once" form:"view_once"`
-	Type     SendType              `json:"type" form:"type"`
-	Compress bool                  `json:"compress"`
+	FromJid  string   `json:"fromJid" form:"fromJid"`
+	ToJid    string   `json:"toJid" form:"toJid"`
+	Caption  string   `json:"caption" form:"caption"`
+	ImageUrl string   `json:"imageUrl" form:"imageUrl"`
+	ViewOnce bool     `json:"view_once" form:"view_once"`
+	Type     SendType `json:"type" form:"type"`
+	Compress bool     `json:"compress"`
 }
 
 type SendImageResponse struct {

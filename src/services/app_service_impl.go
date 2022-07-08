@@ -17,7 +17,6 @@ import (
 )
 
 type AppServiceImpl struct {
-	WaCli          *whatsmeow.Client
 	storeContainer *sqlstore.Container
 }
 
@@ -28,23 +27,23 @@ func NewAppService(storeContainer *sqlstore.Container) AppService {
 }
 
 func (service AppServiceImpl) GetQrcode(c *fiber.Ctx) (response structs.LoginResponse, err error) {
-	service.WaCli = utils.NewWaCLI(service.storeContainer)
+	cli := utils.NewWaCLI(service.storeContainer)
 
-	if service.WaCli == nil {
+	if cli == nil {
 		return response, errors.New("wa cli nil cok")
 	}
 
 	// Disconnect for reconnecting
-	service.WaCli.Disconnect()
+	cli.Disconnect()
 
 	chImage := make(chan string)
 
-	ch, err := service.WaCli.GetQRChannel(context.Background())
+	ch, err := cli.GetQRChannel(context.Background())
 	if err != nil {
 		// This error means that we're already logged in, so ignore it.
 		if errors.Is(err, whatsmeow.ErrQRStoreContainsID) {
-			_ = service.WaCli.Connect() // just connect to websocket
-			if service.WaCli.IsLoggedIn() {
+			_ = cli.Connect() // just connect to websocket
+			if cli.IsLoggedIn() {
 				return response, errors.New("you already logged in :)")
 			}
 			return response, errors.New("your session have been saved, please wait to connect 2 second and refresh again")
@@ -78,7 +77,7 @@ func (service AppServiceImpl) GetQrcode(c *fiber.Ctx) (response structs.LoginRes
 		}()
 	}
 
-	err = service.WaCli.Connect()
+	err = cli.Connect()
 	if err != nil {
 		return response, errors.New("Failed to connect bro " + err.Error())
 	}

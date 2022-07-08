@@ -2,10 +2,10 @@ package routers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"whatsappproxy/aliyunoss"
 	"whatsappproxy/services"
 	"whatsappproxy/structs"
 	"whatsappproxy/utils"
-	"whatsappproxy/validations"
 )
 
 type UserController struct {
@@ -19,11 +19,9 @@ func NewUserController(service services.UserService) UserController {
 func (controller *UserController) Route(app *fiber.App) {
 	app.Post("/whatsappproxy/user/logout", controller.Logout)
 	app.Post("/whatsappproxy/user/reconnect", controller.Reconnect)
-
 	app.Post("/whatsappproxy/user/info", controller.UserInfo)
 	app.Post("/whatsappproxy/user/avatar", controller.UserAvatar)
-	app.Post("/whatsappproxy/user/my/privacy", controller.UserMyPrivacySetting)
-	app.Post("/whatsappproxy/user/my/groups", controller.UserMyListGroups)
+	app.Post("/whatsappproxy/user/online/status", controller.OnlineStatus)
 }
 
 func (controller *UserController) Logout(c *fiber.Ctx) error {
@@ -76,39 +74,40 @@ func (controller *UserController) UserInfo(c *fiber.Ctx) error {
 
 func (controller *UserController) UserAvatar(c *fiber.Ctx) error {
 	var request structs.UserAvatarRequest
-	err := c.QueryParser(&request)
+	err := c.BodyParser(&request)
 	utils.PanicIfNeeded(err)
 
 	// add validation send message
-	validations.ValidateUserAvatar(request)
+	//validations.ValidateUserAvatar(request)
 
-	request.Phone = request.Phone + "@s.whatsapp.net"
+	//request.Phone = request.Phone + "@s.whatsapp.net"
 	response, err := controller.Service.UserAvatar(c, request)
 	utils.PanicIfNeeded(err)
-
+	cdn, bucketPath, fileKey, _ := aliyunoss.UploadByUrl(response.URL)
 	return c.JSON(utils.ResponseData{
 		Code:         200,
 		Succeeded:    true,
 		ResponseCode: "SUCCESS",
-		Value:        response,
+		Value: map[string]interface{}{
+			"jid":         response.Jid,
+			"waAvatarUrl": response.URL,
+			"cdn":         cdn,
+			"bucketPath":  bucketPath,
+			"fileKey":     fileKey,
+		},
 	})
 }
 
-func (controller *UserController) UserMyPrivacySetting(c *fiber.Ctx) error {
-	response, err := controller.Service.UserMyPrivacySetting(c)
+func (controller *UserController) OnlineStatus(c *fiber.Ctx) error {
+	var request structs.UserOnlineStatusRequest
+	err := c.BodyParser(&request)
 	utils.PanicIfNeeded(err)
 
-	return c.JSON(utils.ResponseData{
-		Code:         200,
-		Succeeded:    true,
-		ResponseCode: "SUCCESS",
-		Value:        response,
-	})
-}
+	// add validation send message
+	//validations.ValidateUserAvatar(request)
 
-func (controller *UserController) UserMyListGroups(c *fiber.Ctx) error {
-	response, err := controller.Service.UserMyListGroups(c)
-	utils.PanicIfNeeded(err)
+	//request.Phone = request.Phone + "@s.whatsapp.net"
+	response, err := controller.Service.OnlineStatus(c, request)
 
 	return c.JSON(utils.ResponseData{
 		Code:         200,

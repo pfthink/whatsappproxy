@@ -11,7 +11,7 @@ import (
 
 func ValidateSendMessage(request structs.SendMessageRequest) {
 	err := validation.ValidateStruct(&request,
-		validation.Field(&request.Phone, validation.Required, validation.Length(10, 25)),
+		validation.Field(&request.ToJid, validation.Required, validation.Length(10, 25)),
 		validation.Field(&request.Message, validation.Required, validation.Length(1, 50)),
 	)
 

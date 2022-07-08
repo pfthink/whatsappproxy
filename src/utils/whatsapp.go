@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/pfthink/agollo"
 	"github.com/pfthink/whatsmeow"
@@ -30,6 +31,7 @@ var (
 	startupTime   = time.Now().Unix()
 	CliMap        = make(map[string]*whatsmeow.Client)
 	ApolloClient  agollo.Client
+	Bucket        *oss.Bucket
 )
 
 func GetPlatformName(deviceID int) string {
@@ -145,12 +147,11 @@ func NewWaCLI(storeContainer *sqlstore.Container) *whatsmeow.Client {
 }
 
 func MustLogin(waCli *whatsmeow.Client) {
-	if !waCli.IsConnected() {
-		waCli.Connect()
-		//panic(AuthError{Message: "you are not connect to whatsapp server, please reconnect"})
-	} //else if !waCli.IsLoggedIn() {
-	//panic(AuthError{Message: "you are not login"})
-	//}
+	if waCli == nil {
+		panic(AuthError{Message: "wa cli nil cok"})
+	} else if !waCli.IsConnected() {
+		panic(AuthError{Message: "you are not connect to whatsapp server, please reconnect"})
+	}
 }
 
 func handler(rawEvt interface{}) {

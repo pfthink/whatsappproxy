@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/nacos-group/nacos-sdk-go/common/logger"
+	"whatsappproxy/aliyunoss"
 	"whatsappproxy/discovery"
 	"whatsappproxy/rabbitmq"
 
@@ -57,14 +58,21 @@ func runRest(cmd *cobra.Command, args []string) {
 
 	// register service
 	discovery.InitNacos()
+
 	// init apollo
 	//utils.ApolloClient = config.InitApollo()
+
 	// init rabbitMq
 	imRabbitMq := rabbitmq.InitBossRabbitMq()
 	imRabbitMq.MqConnect()
 
 	//value := utils.ApolloClient.GetConfig("DevCenter.atta-rabbitmq")
 	//logger.Info(value.GetValue("spring.rabbitmq.host"))
+
+	//init aliyunOss
+	utils.Bucket = aliyunoss.InitOssClient()
+
+	//init db
 	db := utils.InitWaDB()
 
 	// Service

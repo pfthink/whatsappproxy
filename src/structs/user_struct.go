@@ -1,9 +1,7 @@
 package structs
 
-import "github.com/pfthink/whatsmeow/types"
-
 type UserRequest struct {
-	Phone string `json:"phone" query:"phone"`
+	Jid string `json:"jid" query:"jid"`
 }
 
 type UserInfoResponseDataDevice struct {
@@ -26,23 +24,23 @@ type UserInfoResponse struct {
 }
 
 type UserAvatarRequest struct {
-	Phone string `json:"phone" query:"phone"`
+	Jid string `json:"jid" query:"jid"`
 }
 
 type UserAvatarResponse struct {
+	Jid  string `json:"jid"`
 	URL  string `json:"url"`
 	ID   string `json:"id"`
 	Type string `json:"type"`
 }
 
-type UserMyPrivacySettingResponse struct {
-	GroupAdd     string `json:"group_add"`
-	LastSeen     string `json:"last_seen"`
-	Status       string `json:"status"`
-	Profile      string `json:"profile"`
-	ReadReceipts string `json:"read_receipts"`
+type UserOnlineStatusRequest struct {
+	Jid       string `json:"jid" query:"jid"`
+	TargetJid string `json:"targetJid" query:"targetJid"`
 }
 
-type UserMyListGroupsResponse struct {
-	Data []types.GroupInfo `json:"data"`
+type UserOnlineStatusResponse struct {
+	Jid          string `json:"jid"`
+	TargetJid    string `json:"targetJid" query:"targetJid"`
+	OnlineStatus int    `json:"onlineStatus"`
 }

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/pfthink/whatsmeow"
 	"github.com/pfthink/whatsmeow/store/sqlstore"
 	"github.com/pfthink/whatsmeow/types"
 	"os"
@@ -14,7 +13,6 @@ import (
 )
 
 type UserServiceImpl struct {
-	WaCli          *whatsmeow.Client
 	storeContainer *sqlstore.Container
 }
 
@@ -25,11 +23,8 @@ func NewUserService(storeContainer *sqlstore.Container) UserService {
 }
 
 func (service UserServiceImpl) Logout(c *fiber.Ctx, request structs.UserRequest) (err error) {
-	jid, _ := utils.ParseJID(request.Phone)
-	service.WaCli = utils.InitWaCLIByJidUser(jid.User, service.storeContainer)
-	if service.WaCli == nil {
-		return errors.New("wa cli nil cok")
-	}
+	cli, _, _ := utils.InitWaClientIfNeed(request.Jid, service.storeContainer)
+	utils.MustLogin(cli)
 
 	// delete history
 	files, err := filepath.Glob("./history-*")
@@ -56,40 +51,25 @@ func (service UserServiceImpl) Logout(c *fiber.Ctx, request structs.UserRequest)
 		}
 	}
 
-	err = service.WaCli.Logout()
+	err = cli.Logout()
 	return
 }
 
 func (service UserServiceImpl) Reconnect(c *fiber.Ctx, request structs.UserRequest) (err error) {
-	jid, _ := utils.ParseJID(request.Phone)
-	service.WaCli = utils.InitWaCLIByJidUser(jid.User, service.storeContainer)
-	if service.WaCli == nil {
-		return errors.New("wa cli nil cok")
-	}
-	service.WaCli.Disconnect()
-	return service.WaCli.Connect()
+	cli, _, _ := utils.InitWaClientIfNeed(request.Jid, service.storeContainer)
+	utils.MustLogin(cli)
+	cli.Disconnect()
+	return cli.Connect()
 }
 
 func (service *UserServiceImpl) UserInfo(_ *fiber.Ctx, request structs.UserRequest) (response structs.UserInfoResponse, err error) {
-	cliMap := utils.CliMap
-	jid, ok := utils.ParseJID(request.Phone)
-	cli, exists := cliMap[jid.User]
-	if !exists {
-		client := utils.InitWaCLIByJidUser(jid.User, service.storeContainer)
-		cliMap[jid.User] = client
-		cli = client
-	}
-
+	cli, jid, _ := utils.InitWaClientIfNeed(request.Jid, service.storeContainer)
 	utils.MustLogin(cli)
-
 	phones := []string{"+" + jid.User}
 	res, err := cli.IsOnWhatsApp(phones)
 	fmt.Println(res)
 	var jids []types.JID
 	//jid, ok := utils.ParseJID(request.Phone)
-	if !ok {
-		return response, errors.New("invalid JID " + request.Phone)
-	}
 
 	jids = append(jids, jid)
 	resp, err := cli.GetUserInfo(jids)
@@ -124,24 +104,9 @@ func (service *UserServiceImpl) UserInfo(_ *fiber.Ctx, request structs.UserReque
 }
 
 func (service *UserServiceImpl) UserAvatar(_ *fiber.Ctx, request structs.UserAvatarRequest) (response structs.UserAvatarResponse, err error) {
-	jid, ok := utils.ParseJID(request.Phone)
-	cliMap := utils.CliMap
-	cli, exists := cliMap[jid.User]
-	if !exists {
-		client := utils.InitWaCLIByJidUser(jid.User, service.storeContainer)
-		cliMap[jid.User] = client
-		cli = client
-	}
+	cli, jid, _ := utils.InitWaClientIfNeed(request.Jid, service.storeContainer)
 	utils.MustLogin(cli)
 
-	/*if service.WaCli == nil {
-		return response, errors.New("wa cli nil cok")
-	}*/
-
-	//jid, ok := utils.ParseJID(request.Phone)
-	if !ok {
-		return response, errors.New("invalid JID " + request.Phone)
-	}
 	pic, err := cli.GetProfilePictureInfo(jid, false)
 	if err != nil {
 		return response, err
@@ -151,38 +116,22 @@ func (service *UserServiceImpl) UserAvatar(_ *fiber.Ctx, request structs.UserAva
 		response.URL = pic.URL
 		response.ID = pic.ID
 		response.Type = pic.Type
-
+		response.Jid = request.Jid
 		return response, nil
 	}
 }
 
-func (service UserServiceImpl) UserMyListGroups(_ *fiber.Ctx) (response structs.UserMyListGroupsResponse, err error) {
-	utils.MustLogin(service.WaCli)
+func (service *UserServiceImpl) OnlineStatus(_ *fiber.Ctx, request structs.UserOnlineStatusRequest) (response structs.UserOnlineStatusResponse, err error) {
+	cli, _, _ := utils.InitWaClientIfNeed(request.Jid, service.storeContainer)
+	utils.MustLogin(cli)
+	targetJid, _ := utils.ParseJID(request.TargetJid)
+	var targetJids = []string{"+" + targetJid.User}
+	resp, err := cli.IsOnWhatsApp(targetJids)
 
-	groups, err := service.WaCli.GetJoinedGroups()
-	if err != nil {
-		return
+	response.Jid = request.Jid
+	response.TargetJid = request.TargetJid
+	if resp[0].IsIn {
+		response.OnlineStatus = 1
 	}
-	fmt.Printf("%+v\n", groups)
-	if groups != nil {
-		for _, group := range groups {
-			response.Data = append(response.Data, *group)
-		}
-	}
-	return response, nil
-}
-
-func (service UserServiceImpl) UserMyPrivacySetting(_ *fiber.Ctx) (response structs.UserMyPrivacySettingResponse, err error) {
-	utils.MustLogin(service.WaCli)
-
-	resp, err := service.WaCli.TryFetchPrivacySettings(false)
-	if err != nil {
-		return
-	}
-
-	response.GroupAdd = string(resp.GroupAdd)
-	response.Status = string(resp.Status)
-	response.ReadReceipts = string(resp.ReadReceipts)
-	response.Profile = string(resp.Profile)
 	return response, nil
 }
